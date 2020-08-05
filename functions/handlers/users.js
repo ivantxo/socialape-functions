@@ -5,8 +5,9 @@ const config = require('../util/config');
 const firebase = require('firebase');
 firebase.initializeApp(config);
 
-const { validateSignupData, validateLoginData } = require('../util/validators');
+const { validateSignupData, validateLoginData, reduceUserDetails } = require('../util/validators');
 
+// Sign users up
 exports.signup = (request, response) => {
   const requestBody = request.body;
   const newUser = {
@@ -62,6 +63,7 @@ exports.signup = (request, response) => {
     });
 }
 
+// Log user in
 exports.login = (request, response) => {
   const requestBody = request.body;
   const user = {
@@ -88,6 +90,47 @@ exports.login = (request, response) => {
     });
 };
 
+// Add user details
+exports.addUserDetails = (request, response) => {
+  let userDetails = reduceUserDetails(request.body);
+
+  db.doc(`/users/${request.user.handle}`).update(userDetails)
+  .then(() => {
+    return response.json({ message: 'Details added successfully' });
+  })
+  .catch(err => {
+    return response.status(500).json({ error: err.code });
+  });
+};
+
+// Get own user details
+exports.getAuthenticatedUser = (request, response) => {
+  let userData = {};
+  db.doc(`/users/${request.user.handle}`)
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        userData.credentials = doc.data();
+        return db
+          .collection('likes')
+          .where('userHandle', '==', request.user.handle)
+          .get();
+      }
+    })
+    .then(data => {
+      userData.likes = [];
+      data.forEach(doc => {
+        userData.likes.push(doc.data());
+      });
+      return response.json(userData);
+    })
+    .catch(err => {
+      console.error(err);
+      return response.status(500).json({ error: err.code });
+    });
+};
+
+// Upload a profile image for user
 let imageFileName;
 let imageToBeUploaded = {};
 exports.uploadImage = (request, response) => {
