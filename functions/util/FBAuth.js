@@ -8,7 +8,8 @@ module.exports = (request, response, next) => {
     console.error('No token found');
     return response.status(403).json({ error: 'Unathorized' });
   }
-  admin.auth().verifyIdToken(idToken)
+  admin.auth()
+    .verifyIdToken(idToken)
     .then(decodedToken => {
       request.user = decodedToken;
       console.log(decodedToken);
@@ -19,6 +20,7 @@ module.exports = (request, response, next) => {
     })
     .then(data => {
       request.user.handle = data.docs[0].data().handle;
+      request.user.imageUrl = data.docs[0].data().imageUrl;
       return next();
     })
     .catch(err => {
