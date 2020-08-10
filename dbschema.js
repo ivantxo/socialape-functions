@@ -29,6 +29,16 @@ let db = {
       imageUrl: 'image/jjendw/jdiyehd'
     }
   ],
+  notifications: [
+    {
+      recipient: 'user',
+      sender: 'john',
+      read: 'true | false',
+      screamId: 'asdadqwe-023jas02',
+      type: 'like | comment',
+      createdAt: '2019-03-15T10:59:52.798Z'
+    }
+  ]
 };
 
 const userDetails = {
