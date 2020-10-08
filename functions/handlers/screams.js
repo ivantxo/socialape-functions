@@ -24,6 +24,9 @@ exports.getAllScreams = (request, response) => {
 };
 
 exports.postOneScream = (request, response) => {
+  if (request.body.body.trim() === '') {
+    return response.status(400).json({ body: 'Body must not be empty' });
+  }
   const requestBody = request.body;
   const newScream = {
     body: requestBody.body,
